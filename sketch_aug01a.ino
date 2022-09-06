@@ -35,6 +35,8 @@ int interruptor1;
 int interruptor2;
 int interruptor4;
 int interruptor5;
+int interruptor6;
+int interruptor7;
 int estado;
 int estadod = 1;
 int alarmaStatus;
@@ -50,7 +52,10 @@ int t ;
 String t1;
 String timed;
 String air;
+String stak;
 int f;
+int contadors;
+int contadork;
 WiFiServer server(80);
 char linebuf[80];
 int charcount = 0;
@@ -92,10 +97,10 @@ void setup(){
   }
 //------------------------------MQ4--------------------------------
 void smog(){
-    if(analogRead(39)>2800){
+    if(analogRead(39)>3700){
     alarmaStatus = 1;
     air = "PELIGRO";
-    }else if(analogRead(39)>2500){
+    }else if(analogRead(39)>3200){
      air = "SUCIO ";
       }else if(analogRead(39)>100){
         air ="LIMPIO ";
@@ -156,6 +161,7 @@ if(alarmaStatus == 1){
   //-----------------------SENSOR-MOVIMIENTO---------------------------------------------
 void sensorMovimiento(){
   if(estado == 0){
+    
         digitalWrite(zumb,0);
         digitalWrite(led4,0);
         delay(200);
@@ -168,8 +174,10 @@ void sensorMovimiento(){
     }           
       }
     if(digitalRead(pir) == 1){
-       digitalWrite(ledsGarage,1);   
+       digitalWrite(ledsGarage,1);
+       stak = "MOVIMIENTO";   
       }else if(digitalRead(pir) == 0){
+        stak = "DEZPEJADO";
        digitalWrite(ledsGarage,0);         
       }
     } 
@@ -198,6 +206,17 @@ void screem(){
   }else{
   digitalWrite(led2,0);
   }
+    if(interruptor6 == 1){
+  digitalWrite(led1,1);
+  }else{
+  digitalWrite(led1,0);
+  }
+  if(interruptor7 == 1){
+  digitalWrite(led2,1);
+  }else{
+  digitalWrite(led2,0);
+  }
+  
   if(interruptor4 == 1){
   estado = 1;
   }else{
@@ -298,59 +317,206 @@ if(client){
     if(client.available()){
       char c = client.read();
       Serial.write(c);
+
       linebuf[charcount] = c;
       if(charcount<sizeof(linebuf)-1) charcount++;
+      String pagina = "<!DOCTYPE html>"
+"<html lang=\"en\">"
+"<head>"   
+"<meta charset=\"UTF-8\">"
+"<meta http-equiv=\"refresh\" content=\"1\" >"
+    "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">"
+    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+    "<title>Document</title>"
+"</head>"
+"<style>"
+    "*{"
+        "box-sizing: border-box;"
+        "margin: 0;"
+        "padding: 0;"
+        "text-decoration: none;"
+        "list-style: none;}"
+    "body{"
+       " margin: 0 1%;"
+        "background: #12203e;"
+        "font-size: 3rem;"
+        "display: grid;"
+        "height: 100vh;"
+        "grid-template-columns: repeat(3,1fr);"
+        "grid-template-rows: repeat(3,1fr);"
+        "grid-template-areas: 'temp temp ligh'"
+                             "'temp temp ligh1'"
+                             "'alar dist mov';"
+        "gap:1% ;"
+   " }       body .temp{"
+        "grid-area: temp;"
+        "display: flex;"
+        "font-size: 2rem;"
+        "flex-direction: column;"
+        "justify-content: center;"
+        "align-items: center; "       
+        "background: #55a8fd;"
+        "border-radius: 2rem;"
+        "color: brown;        }"
+"body .temp .tempdata{"
+ "   font-size: 8.9rem;"
+    "font-weight: bold;"
+    "color:  #f4fa3d;}"
+"body .temp .tempdata2{"
+ "   font-size: 6rem;"
+    "font-weight: bold;"
+    "color: #12203e;}"
+"body .temp .p2{"
+    "font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"
+    "font-size: 3rem;}"
+"body .hab1{"
+    "border: 2px solid whitesmoke;"
+    "color: #12203e;"
+    "background: #FAA43D;"
+    "font-size: 4.5rem;"
+    "font-weight: 100;"
+    "height: 100%;"
+    "font-weight: bold;"
+    "border-radius: 2rem;"
+    "text-align: center;"
+    "padding-top: 2rem;"
+    "line-height: 100%;   }"
+"body .hab1 .ona{"
+"display: inline-block;"
+"padding: 1.3rem;"
+"border-radius: 50%;"
+"border: 2px solid black;"
+"background: hsl(120,95%,65%);}"
+"body .hab1 .ofa{"
+"display: inline-block;"
+"padding: 1.3rem;"
+"border-radius: 50%;"
+"border: 2px solid black;"
+"background: hsl(0,95%,65%);}"
+"body .hab2{"
+    "color: antiquewhite;"
+    "background: #34123e;"
+    "border: 2px solid whitesmoke;}"
+
+"body .hab2 .onk{"
+    "display: inline-block;"
+    "border-radius: 1rem;"
+    "background: hsl(120,95%,65%);}"
+"body .hab2 .ofk{"
+    "display: inline-block;"
+  "  border-radius: 1rem;"
+ "   background: hsl(0,95%,65%);}"
+"body .hab3{"
+   " font-size: 7rem;   "
+    "color: rgb(246, 239, 41);"
+    "background: hsl(252,30%,10%);"
+    "border: 2px solid whitesmoke;}"
+"body .hab4{    "
+ "   background: whitesmoke;"
+   " color:rgb(58, 50, 92);"
+    "border: 2px solid  hsl(252,30%,10%);"
+  "  padding-top: 70px;}"
+"body #dateDis{"
+ "   font-size: 9rem;"
+    "color: #FAA43D;}"
+"@media (max-width: 640px) {"
+ "   body{"
+    "height: 188px;"
+    "width: 100vh;"
+    "display: flex;"
+    "flex-direction: column; }"
+    "body .temp{"
+  "  height: 900px;"
+   " font-weight: bold;"
+    "display: flex;"
+ "   font-size: 3rem;"
+  "  flex-direction: column;"
+   " justify-content: center;"
+    "align-items: center; "       
+  "  background: #55a8fd;"
+   " border-radius: 2rem;"
+    "color: brown;   }"
+"body .temp .tempdata{"
+ "   font-size: 12.9rem;"
+    "font-weight: bold;"
+    "color:  #f4fa3d;}"
+"body .temp .p2{"
+"    display: flex;"
+ "   flex-direction: column;"   
+  "  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"
+   " font-size: 3rem;}"
+"body .hab1{"
+ "   border: 2px solid whitesmoke;"
+  "  color: #12203e;"
+ "   background: #FAA43D;"
+   " font-size: 4.5rem;"
+  "  font-weight: 100;"
+   " height: 100%;"
+   " font-weight: bold;"
+   " border-radius: 2rem;"
+  "  text-align: center;"
+ "   padding-top: 2rem;}"
+"body .hab2{"
+ "   color: antiquewhite;"
+  "  background: #34123e;"
+ "   border: 2px solid whitesmoke;}}"
+"</style>"
+"<body>"
+   " <div class=\"temp\">  <div><span class=\"span1\" >TEMP:<span class=\"tempdata\">"+String(t)+"°</span>&nbsp;</span> <span> HUM:<span class=\"tempdata\">"+String(h)+"%</span> </span> </div>     </br>"
+"    <p class=\"p2\">TIEMPO:<span class=\"tempdata2\">"+timed+"</span>  &nbsp; AIRE:<span class=\"tempdata2\">"+air+"</span> </p></div>"
+ "   <div><p class=\"hab1\">HABITACION <br><a href=\"on1\" class=\"ona\">ON</a> <a href=\"off1\" class=\"ofa\">OFF</a></p></div>"
+  "  <div><p class=\"hab1\">  COMEDOR <br><a href=\"on2\" class=\"ona\">ON</a> <a href=\"off2\" class=\"ofa\">OFF</a></p></div>"
+   " <div><p class=\"hab1 hab2\">ALARMA <br><a href=\"alarmon\" class=\"onk\">ON</a> <a href=\"alarmoff\" class=\"ofk\"> OFF</a></p></div>"
+    "<div><p class=\"hab1 hab3\" id=\"dateDis1\"><span id=\"dateDis\">"+String(distancia)+"</span>cm</p></div>"
+   " <div><p class=\"hab1 hab4\" id=\"dateDis2\">"+stak+"</p></div>"
+ "<!--- <div><p>PUERTA<a href=\"\">ON</a> <a href="">OFF</a></p></div>---->"
+"<script>"
+  "  function interec(){"
+  "     const items = document.getElementById('dateDis1'); "
+   "    var dateDis = document.getElementById('dateDis').innerHTML;"
+    "   const items2 = document.getElementById('dateDis2'); "
+     "  var datek = document.getElementById('dateDis2').innerHTML;"
+      " if(dateDis < 101 ){"
+       " items.style.background = ' rgb(52, 14, 205)'    }"
+   " if(dateDis < 31 ){"
+    "    items.style.background = ' rgb(241, 108, 0)'    }"
+    "if(dateDis < 13 ){"
+     "   items.style.background = ' rgb(254, 6, 6)'   }"
+    "if(datek == 'MOVIMIENTO' ){"
+     "   items2.style.background = ' rgb(246, 239, 41)'  }"
+   " console.log(datek);}"
+   "interec();"
+"</script>"
+"</body>"
+"</html>";
       if(c == '\n' && currentLineIsBlank){
         client.println("HTTP/1.1 200 ok");
         client.println("Content-Type: text/html");
         client.println("Connection: close");
         client.println();
-        client.println("<!DOCTYPE HTML><html><head>");
-        client.println("<meta http-equiv=\"refresh\" content=\"1\" >");
-        client.println("<body id=\"body\" style=\"transition: background-color 2s; background: radial-gradient(circle, rgba(63,94,251,1) 7%, rgba(23,207,156,0.9411473207447041) 100%);display: flex; flex-direction: column; align-items: center; font-family: 'Maven Pro', sans-serif;font-size: 5rem; gap: 10px;\">");
-        client.println("<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">");
-        client.println("<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>");
-        client.println("<link href=\"https://fonts.googleapis.com/css2?family=Maven+Pro:wght@700&display=swap\" rel=\"stylesheet\">");
-        client.println(" <p style=\"margin: 0; color:#ffffff ; font-size: 8rem;\" id=\"text1\">"+air+" "+timed+"</p>");
-        client.println(" <p style=\"margin: 0; color:#ffffff ; font-size: 8rem;\" id=\"text1\">"+String(t)+" "+String(h)+" "+"</p>");
-        client.println(" <p style=\"margin: 0; color:#ffffff\">LED 1 <a href=\"on1\"><button style=\"padding:100px ;font-size: 4rem; width: 300px; ; background: hsl(133, 84%, 48%);\">ON</button></a>&nbsp;<a href=\"off1\"><button style=\"padding:20px ; font-size: 4rem; width: 300px;; ; background:red;\">OFF</button></a></p>");
-        client.println(" <p style=\"margin: 0; color:#ffffff\">LED 2 <a href=\"on2\"><button style=\"padding:100px ;font-size: 4rem; width: 300px; ; background: hsl(133, 84%, 48%);\">ON</button></a>&nbsp;<a href=\"off2\"><button style=\"padding:20px ; font-size: 4rem; width: 300px; ; background:red;\">OFF</button></a></p>");
-        client.println("<script>");
-        client.println("function recargar(){");
-        client.println("var bodyt=document.getElementById(\"body\")");
-        client.println("var temp =document.getElementById(\"text1\").innerHTML;");
-        client.println("if(temp > 1000 && temp < 2000){");
-        client.println("bodyt.style.background=\"radial-gradient(circle, rgba(63,94,251,1) 7%, rgba(125,23,207,0.9411473207447041) 100%)\"");
-        client.println("}else if(temp>2000){");
-        client.println("bodyt.style.background=\"radial-gradient(circle, rgba(233,63,251,1) 7%, rgba(207,23,42,0.9411473207447041) 100%)\"}}");
-        client.println("recargar();</script>");
-        client.println("</body></html>");        
+        client.println(pagina) ;  
         break;
         }
         if (c == '\n'){
           currentLineIsBlank = true;
-          if(strstr(linebuf,"GET /on1")>0){
-            Serial.println("LED 1 ON");
-            interruptor1 = 1;
+         if(strstr(linebuf,"GET /on1")>0){
+              Serial.println("LED 2 ON");
+              interruptor6 = 1;   
             }
             else if(strstr(linebuf,"GET /off1")>0){
-              Serial.println("LED 1 OFF");
-             interruptor1 = 0;   
+              Serial.println("LED 2 OFF");
+                           interruptor6 = 0;   
+
             }
+            
             else if(strstr(linebuf,"GET /on2")>0){
               Serial.println("LED 2 ON");
-            interruptor4 = 1;   
+                         interruptor7 = 1;   
+
             }
-            else if(strstr(linebuf,"GET /off2")>0){             
+            else if(strstr(linebuf,"GET /off2")>0){
               Serial.println("LED 2 OFF");
-              cont++;
-              if(cont > 0){
-              interruptor4 = 0;               
-                }else if(cont == 0){
-            interruptor4 = 0;           
-            alarmaStatus = 0;
-           // alarmaBip();
-            }  
+               interruptor7 = 0;     
             }
               currentLineIsBlank = true;
               memset(linebuf,0,sizeof(linebuf));
@@ -360,12 +526,20 @@ if(client){
         }
       }
     }
+
     delay(1);
     client.stop();
     Serial.println("cliente desconectado");
   }
      
 temp();
- Serial.println(distancia);
+ Serial.println(analogRead(39));
  
   }
+/*  void setup(){
+    Serial.begin(9600);
+    pinMode(39,INPUT);
+    }
+    void loop(){
+      Serial.println(analogRead(39));
+      }*/
